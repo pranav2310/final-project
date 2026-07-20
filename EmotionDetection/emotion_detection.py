@@ -7,14 +7,24 @@ def emotion_detector(text_to_analyze):
     input_json = { "raw_document": { "text": text_to_analyze } }
     
     response = requests.post(url, headers=header, json=input_json)
-    formatted_response = json.loads(response.text)
-    result = {
-        'anger':formatted_response['emotionPredictions'][0]['emotion']['anger'],
-        'disgust':formatted_response['emotionPredictions'][0]['emotion']['disgust'],
-        'fear':formatted_response['emotionPredictions'][0]['emotion']['fear'],
-        'joy':formatted_response['emotionPredictions'][0]['emotion']['joy'],
-        'sadness':formatted_response['emotionPredictions'][0]['emotion']['sadness']
-    }
-    result['dominant_emotion'] = max(result, key=result.get)
-
+    if response.status_code == 400:
+        result = {
+            'anger':None,
+            'disgust':None,
+            'fear':None,
+            'joy':None,
+            'sadness':None,
+            'dominant_emotion':None
+        }
+    else:
+        formatted_response = json.loads(response.text)
+        result = {
+            'anger':formatted_response['emotionPredictions'][0]['emotion']['anger'],
+            'disgust':formatted_response['emotionPredictions'][0]['emotion']['disgust'],
+            'fear':formatted_response['emotionPredictions'][0]['emotion']['fear'],
+            'joy':formatted_response['emotionPredictions'][0]['emotion']['joy'],
+            'sadness':formatted_response['emotionPredictions'][0]['emotion']['sadness']
+        }
+        result['dominant_emotion'] = max(result, key=result.get)
+        
     return result
